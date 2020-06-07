@@ -17,15 +17,21 @@ MongoClient.connect(connectionString, {
     console.log('Connected to Database')
     const db = client.db('quotesDB')
     const quotesCollection = db.collection('quotes')
+
+    app.set('view engine','ejs')
     
     app.get('/', (req, res) => {
-        res.sendFile(__dirname + '/index.html')
+        const cursor = db.collection('quotes').find().toArray()
+        .then(results => {
+            res.render('index.ejs', { quotes: results})
+        })
+        .catch(error => console.error(error))
     })
     
     app.post('/quotes', (req, res) => {
         quotesCollection.insertOne(req.body)
         .then(result => {
-            console.log(result)
+            // console.log(result)
         })
         .catch(error => console.error(error))
     })
